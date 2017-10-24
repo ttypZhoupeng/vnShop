@@ -64,6 +64,7 @@
     "shelljs": "^0.7.6",
     "sinon": "^4.0.0",
     "sinon-chai": "^2.8.0",
+    "tapable": "^0.2.8",
     "url-loader": "^0.5.8",
     "vue-infinite-scroll": "^2.0.2",
     "vue-lazyload": "^1.1.4",

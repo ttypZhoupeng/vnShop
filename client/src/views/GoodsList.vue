@@ -72,7 +72,7 @@
                 sortFlag:true,
                 priceChecked:'all',
                 data:[],
-                busy:false,
+                busy: true,
                 page:1,
                 pageSize:8,
                 priceFilter:[
@@ -114,10 +114,15 @@
             axios.get('/goods/list',{params:param}).then(res=>{
                 if(flag){
                     this.goods = this.goods.concat(res.data.result);
+                    if(res.data.result.length == 0){
+                        this.busy = true;
+                    }else{
+                        this.busy = false;
+                    }
                 }else{
                     // 第一次加载数据
                     this.goods = res.data.result;
-
+                    this.busy = false;
                 }
             })
            },
@@ -130,8 +135,11 @@
                this.getGoodsList();
             },
             loadMore:function(){
-                console.log(111);
-                this.getGoodsList();
+                this.busy = true;
+                setTimeout(()=>{
+                    this.page ++;
+                    this.getGoodsList(true);
+                },1000);
             }
         }
     }
