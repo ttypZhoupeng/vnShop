@@ -8,7 +8,7 @@
             <div class="filter-nav">
                 <span class="sortby">Sort by:</span>
                 <a href="javascript:void(0)" class="default cur">Default</a>
-                <a href="javascript:void(0)" class="price">Price <svg class="icon icon-arrow-short"><use xlink:href="#icon-arrow-short"></use></svg></a>
+                <a href="javascript:void(0)" class="price" @click="sortGoods">价格 <svg class="icon icon-arrow-short"><use xlink:href="#icon-arrow-short"></use></svg></a>
                 <a href="javascript:void(0)" class="filterby stopPop">Filter by</a>
             </div>
             <div class="accessory-result">
@@ -17,18 +17,10 @@
                     <dl class="filter-price">
                         <dt>Price:</dt>
                         <dd><a href="javascript:void(0)">All</a></dd>
-                        <dd>
-                            <a href="javascript:void(0)">0 - 100</a>
+                        <dd v-for="(item,index) in priceFilter" :key="index">
+                            <a @click="setPriceFilter(index)" :class="{'cur':priceChecked == index}" href="javascript:void(0)">{{item.startPrice}} - {{item.endPrice}}</a>
                         </dd>
-                        <dd>
-                            <a href="javascript:void(0)">100 - 500</a>
-                        </dd>
-                        <dd>
-                            <a href="javascript:void(0)">500 - 1000</a>
-                        </dd>
-                        <dd>
-                            <a href="javascript:void(0)">1000 - 2000</a>
-                        </dd>
+                        
                     </dl>
                 </div>
 
@@ -76,26 +68,74 @@
         },
         data(){
             return{
-                goods:{}
+                goods:{},
+                sortFlag:true,
+                priceChecked:'all',
+                data:[],
+                busy:false,
+                page:1,
+                pageSize:8,
+                priceFilter:[
+                    {
+                        startPrice:'0',
+                        endPrice:'100'
+                    },
+                    {
+                        startPrice:'100',
+                        endPrice:'500'
+                    },
+                    {
+                        startPrice:'500',
+                        endPrice:'1000'
+                    },
+                    {
+                        startPrice:'1000',
+                        endPrice:'2000'
+                    },
+                ]
             }
         },
         created(){
-            this.goodsGetList()
+            this.getGoodsList()
         },
         methods:{
-           goodsGetList(){
+           getGoodsList(flag){
             //    axios.get('http://easy-mock.com/mock/59664d4d58618039284c7710/example/goods/list').then(res=>{
             //         console.log(res);
             //         this.goods = res.data.data;
             //     }) 
-            axios.get('/goods/list').then(res=>{
-                this.goods = res.data.result;
+            let sort = this.sortFlag ? 1 : -1;
+            let param = {
+                sort:sort,
+                priceLevel:this.priceChecked,
+                page:this.page,
+                pageSize:this.pageSize
+            }
+            axios.get('/goods/list',{params:param}).then(res=>{
+                if(flag){
+                    this.goods = this.goods.concat(res.data.result);
+                }else{
+                    // 第一次加载数据
+                    this.goods = res.data.result;
+
+                }
             })
-           }
+           },
+           sortGoods(){
+                this.sortFlag = !this.sortFlag;
+                this.getGoodsList();
+            },
+            setPriceFilter(index){
+               this.priceChecked = index;
+               this.getGoodsList();
+            },
+            loadMore:function(){
+                console.log(111);
+                this.getGoodsList();
+            }
         }
     }
 </script>
-
 <style>
 
 </style>

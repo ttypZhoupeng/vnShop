@@ -5,13 +5,16 @@ import App from './App'
 import router from './router'
 import VueLazyload from 'vue-lazyload';
 
-import '../static/css/index.css'
-Vue.config.productionTip = false
+import infiniteScroll from 'vue-infinite-scroll'
+Vue.use(infiniteScroll)
 
 
 Vue.use(VueLazyload,{
   loading:'/static/img/ok-2.png'
 })
+
+import '../static/css/index.css'
+Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
