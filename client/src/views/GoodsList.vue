@@ -16,7 +16,7 @@
                 <div class="filter stopPop" id="filter">
                     <dl class="filter-price">
                         <dt>Price:</dt>
-                        <dd><a href="javascript:void(0)">All</a></dd>
+                        <dd><a href="javascript:void(0)" :class="{'cur':priceChecked == 'all'}" @click="setPriceFilter('all')">All</a></dd>
                         <dd v-for="(item,index) in priceFilter" :key="index">
                             <a @click="setPriceFilter(index)" :class="{'cur':priceChecked == index}" href="javascript:void(0)">{{item.startPrice}} - {{item.endPrice}}</a>
                         </dd>
@@ -40,6 +40,9 @@
                                     </div>
                                 </div>
                             </li>
+                            <div v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="10">
+                            ...
+                            </div>
                         </ul>
                     </div>
                 </div>
