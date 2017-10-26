@@ -4,7 +4,7 @@
       <div class="container">
         <div class="header-logo">
           <a href="index.php" title="小米官网">
-            <img src="../../static/img/logo.png" />
+            <img src="../../static/img/vn-logo.png" />
           </a>
         </div>
         <div class="header-nav">
@@ -40,15 +40,15 @@
         <!-- <div class="container-user"> -->
         <div class="topbar-cart" id="ECS_CARTINFO">
           <a class="cart-mini " href="flow.php">
-            <i class="iconfont">&#xe60c;</i> 购物车
+            <router-link to="/cart" class="iconfont">&#xe60c;购物车</router-link> 
             <span class="mini-cart-num J_cartNum" id="hd_cartnum">(0)</span>
           </a>
         </div>
         <div class="topbar-info J_userInfo" id="ECS_MEMBERZONE">
           <span v-text="nickName"></span>
           <a class="link"  rel="nofollow" v-if="!nickName" @click="loginModalFlag = true">登录</a>
-          <!-- <span class="sep">|</span>
-          <a class="link" href="user.php?act=register" rel="nofollow">注册</a> -->
+          <span class="sep" v-if="nickName">|</span>
+          <a class="link" v-if="nickName" @click="logout" rel="nofollow">退出</a>
         </div>
         <!-- </div> -->
       </div>
@@ -102,6 +102,9 @@
         loginModalFlag:false// 控制模态框和遮罩层的显示隐藏
       }
     },
+    created(){
+      this.checkLogin()
+    },
     methods:{
       login(){
         axios.post('/users/login',{
@@ -111,6 +114,21 @@
           let res = result.data;
           this.nickName = res.result.userName;
           this.loginModalFlag = false;
+        })
+      },
+      checkLogin(){
+        axios.post('/users/checkLogin').then(result=>{
+          console.log(result);
+          let res = result.data;
+          console.log(res);
+          this.nickName = res.result;
+        })
+      },
+      logout(){
+        axios.post('users/logout').then(result=>{
+          let res = result.data;
+          this.nickName = '';//nickName清空
+          console.log(res);
         })
       }
     }

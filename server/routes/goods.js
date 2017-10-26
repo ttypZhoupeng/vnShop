@@ -3,6 +3,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 
 var Goods = require('../models/goods');
+var User = require('../models/user');
 // 连接数据可
 mongoose.connect('mongodb://localhost:27017/shop');
 
@@ -49,28 +50,38 @@ router.get('/list',function(req,res,next){
         letpriceLte = '';
     let param = '';
     if(priceLevel != 'all'){
-        switch(priceLevel){
-            case'0':
-                priceGt = 0;
-                priceLte = 100;
-                break;
-            case'1':
-                priceGt = 100;
-                priceLte = 500;
-                break;
-            case'2':
-                priceGt = 500;
-                priceLte = 1000;
-                break;
-            case'3':
-                priceGt = 1000;
-                priceLte = 2000;
-                break;
-        }
+        // switch(priceLevel){
+        //     case'0':
+        //         priceGt = 0;
+        //         priceLte = 100;
+        //         break;
+        //     case'1':
+        //         priceGt = 100;
+        //         priceLte = 500;
+        //         break;
+        //     case'2':
+        //         priceGt = 500;
+        //         priceLte = 1000;
+        //         break;
+        //     case'3':
+        //         priceGt = 1000;
+        //         priceLte = 2000;
+        //         break;
+        // }
+
+        let priceItem = [
+            [0,100],
+            [100,500],
+            [500,1000],
+            [1000,2000]
+        ];
+        
         param = {
             salePrice:{
-                $gt: priceGt,
-                $lte: priceLte
+                // $gt: priceGt,
+                // $lte: priceLte
+                $gt:priceItem[priceLevel][0],
+                $lte:priceItem[priceLevel][1]
             }
         }
     }
@@ -84,6 +95,46 @@ router.get('/list',function(req,res,next){
             res.json({ status:'1', msg:err.message})
         }else{
             res.json({ status:'0', msg:'', result:doc })
+        }
+    })
+})
+
+router.post('/addCart',function(req,res,next){
+    var productId = req.body.productId;
+    console.log(productId);
+
+    var userId = 100000077;
+
+    User.findOne({userId:userId},function(err,userDoc){
+        let goodItem = '';
+        userDoc.cartList.forEach(function(item){
+            if(item.productId == productId){
+                goodItem = item;
+                item.productNum++
+            }
+        })
+
+        if(goodItem){
+            userDoc.save(function(err2,doc2){
+                if(err2){
+                    res.json({status:'1',msg:err2.message})
+                }else{
+                    res.json({status:'0',msg:'',result:'商品数量添加成功'})
+                }
+            })
+        }else{
+            Goods.findOne({'productId':productId},function(err,goodsDoc){
+                goodsDoc.productNum = 1;
+
+                userDoc.cartList.push(goodsDoc);
+                userDoc.save(function(err2,doc2){
+                    res.json({
+                        status:'0',
+                        msg:'',
+                        result:'加入购物车成功'
+                    })
+                })
+            })
         }
     })
 })
